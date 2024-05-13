@@ -31,8 +31,9 @@ class PartialParse(object):
         ### Note: The root token should be represented with the string "ROOT"
         ### Note: If you need to use the sentence object to initialize anything, make sure to not directly 
         ###       reference the sentence object.  That is, remember to NOT modify the sentence object. 
-
-
+        self.stack = ['ROOT']
+        self.buffer = sentence[:]
+        self.dependencies = []
         ### END YOUR CODE
 
 
@@ -50,8 +51,15 @@ class PartialParse(object):
         ###         1. Shift
         ###         2. Left Arc
         ###         3. Right Arc
-
-
+        if transition == 'S' :
+            self.stack.append(self.buffer[0])
+            self.buffer.pop(0)
+        elif transition == 'LA':
+            self.dependencies.append((self.stack[-1], self.stack[-2]))
+            self.stack.pop(-2)
+        else:
+            self.dependencies.append((self.stack[-2], self.stack[-1]))
+            self.stack.pop(-1)
         ### END YOUR CODE
 
     def parse(self, transitions):
@@ -101,10 +109,18 @@ def minibatch_parse(sentences, model, batch_size):
     ###             contains references to the same objects. Thus, you should NOT use the `del` operator
     ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
     ###             is being accessed by `partial_parses` and may cause your code to crash.
-
-
+    partial_parses = [PartialParse(sent) for sent in sentences]
+    unfinished_parses = partial_parses[:]
+    while unfinished_parses:
+        # copy to mini batch
+        mini_batch = unfinished_parses[:batch_size]
+        transitions = model.predict(mini_batch)
+        for i, transition in enumerate(transitions):
+            mini_batch[i].parse_step(transition)
+        # dependencies.extend(p.dependencies for p in mini_batch)
+        unfinished_parses = [p for p in unfinished_parses if len(p.stack) > 1 or len(p.buffer) > 0]
+    dependencies.extend(p.dependencies for p in partial_parses)
     ### END YOUR CODE
-
     return dependencies
 
 
