@@ -160,3 +160,29 @@ if __name__ == "__main__":
         UAS, dependencies = parser.parse(test_data)
         print("- test UAS: {:.2f}".format(UAS * 100.0))
         print("Done!")
+
+
+# Debug mode 
+# Average Train Loss: 0.14676176011562347
+# Evaluating on dev set
+# 125250it [00:00, 18531044.34it/s]                                               
+# - dev UAS: 68.70
+# New best dev UAS! Saving model.
+
+# Full dataset
+# Epoch 10 out of 10
+# 100%|███████████████████████████████████████| 1848/1848 [00:54<00:00, 33.69it/s]
+# Average Train Loss: 0.06684758304517506
+# Evaluating on dev set
+# 1445850it [00:00, 64624194.78it/s]                                              
+# - dev UAS: 88.65
+
+# ================================================================================
+# TESTING
+# ================================================================================
+# Restoring the best model weights found on the dev set
+# Final evaluation on test set
+# 2919736it [00:00, 91316404.57it/s]                                              
+# - test UAS: 89.13
+# Done!
+
